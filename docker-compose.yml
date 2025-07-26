@@ -1,0 +1,33 @@
+services:
+  client:
+    build: ./client
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - server
+    networks:
+      - zuma-network
+
+  server:
+    build: ./server
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./server:/app
+      - zuma-db:/app
+    environment:
+      - PYTHONPATH=/app
+    networks:
+      - zuma-network
+
+volumes:
+  zuma-db:
+
+networks:
+  zuma-network:
+    driver: bridge 
