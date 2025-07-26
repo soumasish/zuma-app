@@ -9,14 +9,15 @@ import json
 def check_availability(community_name: str, bedrooms: float) -> str:
     """Check availability of units in a community with specified number of bedrooms"""
     import logging
+
     logger = logging.getLogger(__name__)
-    logger.info(f"Tool called with community_name={community_name}, bedrooms={bedrooms}")
-    
+    logger.info(
+        f"Tool called with community_name={community_name}, bedrooms={bedrooms}"
+    )
+
     try:
-        # Get database session using context manager
         session_gen = get_session()
         with next(session_gen) as session:
-            # First check if the community exists by name
             community_repo = CommunityRepository()
             community = community_repo.get_by_name(session, community_name)
 
@@ -28,18 +29,20 @@ def check_availability(community_name: str, bedrooms: float) -> str:
                     }
                 )
 
-           
             repo = PropertyRepository()
             properties = repo.get_by_community(session, community.id)
-            logger.info(f"Found {len(properties)} properties for community {community_name}")
+            logger.info(
+                f"Found {len(properties)} properties for community {community_name}"
+            )
 
-            # Filter by bedrooms and availability (using available_date instead of available)
             available_units = [
                 prop
                 for prop in properties
                 if prop.bedrooms == bedrooms and prop.available_date is not None
             ]
-            logger.info(f"Found {len(available_units)} available units with {bedrooms} bedrooms")
+            logger.info(
+                f"Found {len(available_units)} available units with {bedrooms} bedrooms"
+            )
 
             if not available_units:
                 return json.dumps(
@@ -49,7 +52,6 @@ def check_availability(community_name: str, bedrooms: float) -> str:
                     }
                 )
 
-            # Format the first available unit
             unit = available_units[0]
             result = {
                 "available": True,
@@ -71,20 +73,16 @@ def check_availability(community_name: str, bedrooms: float) -> str:
 def check_pet_policy(community_id: int, pet_type: str) -> str:
     """Check pet policy for a specific pet type in a community"""
     try:
-        # Get database session using context manager
         session_gen = get_session()
         with next(session_gen) as session:
-            # First check if the community exists
             community_repo = CommunityRepository()
             community = community_repo.get_by_id(session, community_id)
 
             if not community:
                 return json.dumps({"error": f"Community {community_id} does not exist"})
 
-            # Get pet policies directly from the community
             pet_policies = community_repo.get_pet_policies(session, community_id)
 
-            # Find policy for the specified pet type
             pet_type_enum = PetType(pet_type.lower())
             matching_policy = None
 
@@ -118,7 +116,6 @@ def get_pricing(community_id: int, unit_id: str, move_in_date: str) -> str:
     try:
         session_gen = get_session()
         with next(session_gen) as session:
-            # Use repository to get the specific property
             property_repo = PropertyRepository()
             property_obj = property_repo.get_by_id(session, int(unit_id))
 
@@ -152,7 +149,9 @@ def get_pricing(community_id: int, unit_id: str, move_in_date: str) -> str:
 
 
 @tool
-def propose_tour(lead_name: str, community_name: str, unit_description: str, available_date: str) -> str:
+def propose_tour(
+    lead_name: str, community_name: str, unit_description: str, available_date: str
+) -> str:
     """Propose a tour when you have enough information to suggest a specific time slot"""
     result = {
         "action": "propose_tour",
@@ -161,8 +160,8 @@ def propose_tour(lead_name: str, community_name: str, unit_description: str, ava
         "unit_info": {
             "community": community_name,
             "description": unit_description,
-            "available_date": available_date
-        }
+            "available_date": available_date,
+        },
     }
     return json.dumps(result, indent=2)
 
@@ -173,7 +172,7 @@ def ask_clarification(lead_name: str, missing_info: str) -> str:
     result = {
         "action": "ask_clarification",
         "message": f"Hi {lead_name}! I'd be happy to help you find the perfect place. To better assist you, could you please clarify: {missing_info}",
-        "missing_info": missing_info
+        "missing_info": missing_info,
     }
     return json.dumps(result, indent=2)
 
@@ -185,6 +184,6 @@ def handoff_human(lead_name: str, reason: str) -> str:
         "action": "handoff_human",
         "message": f"Hi {lead_name}! I'd like to connect you with one of our leasing specialists who can better assist you with your request. {reason} They'll be in touch within the next hour.",
         "reason": reason,
-        "escalation": True
+        "escalation": True,
     }
     return json.dumps(result, indent=2)

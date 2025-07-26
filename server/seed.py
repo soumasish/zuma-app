@@ -48,7 +48,6 @@ def create_sample_communities() -> List[dict]:
 def create_sample_community_pet_policies() -> List[dict]:
     """Create sample pet policies for communities"""
     return [
-        # Pet policies for Sunset Gardens (community_id: 1)
         {
             "community_id": 1,
             "pet_policies": [
@@ -56,7 +55,6 @@ def create_sample_community_pet_policies() -> List[dict]:
                 {"pet_type": PetType.DOG, "extra_pet_fee": 50.0},
             ],
         },
-        # Pet policies for Riverside Heights (community_id: 2)
         {
             "community_id": 2,
             "pet_policies": [
@@ -64,7 +62,6 @@ def create_sample_community_pet_policies() -> List[dict]:
                 {"pet_type": PetType.DOG, "extra_pet_fee": 75.0},
             ],
         },
-        # Pet policies for Oakwood Village (community_id: 3)
         {
             "community_id": 3,
             "pet_policies": [
@@ -72,7 +69,6 @@ def create_sample_community_pet_policies() -> List[dict]:
                 {"pet_type": PetType.DOG, "extra_pet_fee": 45.0},
             ],
         },
-        # Pet policies for Downtown Lofts (community_id: 4)
         {
             "community_id": 4,
             "pet_policies": [
@@ -80,7 +76,6 @@ def create_sample_community_pet_policies() -> List[dict]:
                 {"pet_type": PetType.DOG, "extra_pet_fee": 60.0},
             ],
         },
-        # Pet policies for Mountain View Estates (community_id: 5)
         {
             "community_id": 5,
             "pet_policies": [
@@ -94,13 +89,12 @@ def create_sample_community_pet_policies() -> List[dict]:
 def create_sample_properties() -> List[dict]:
     """Create sample property data with pricing"""
     return [
-        # Properties for Sunset Gardens (community_id: 1)
         {
             "description": "Cozy 2-bedroom apartment with garden view",
             "bedrooms": 2.0,
             "bathrooms": 1.5,
             "garage": False,
-            "available_date": "2024-01-15",
+            "available_date": "2025-06-15",
             "base_rent": 1800.0,
             "special_offer": "1st month free",
             "community_id": 1,
@@ -110,18 +104,17 @@ def create_sample_properties() -> List[dict]:
             "bedrooms": 3.0,
             "bathrooms": 2.5,
             "garage": True,
-            "available_date": "2024-02-01",
+            "available_date": "2025-06-01",
             "base_rent": 2400.0,
             "special_offer": "No deposit required",
             "community_id": 1,
         },
-        # Properties for Riverside Heights (community_id: 2)
         {
             "description": "Luxury 1-bedroom apartment with riverfront balcony",
             "bedrooms": 1.0,
             "bathrooms": 1.0,
             "garage": True,
-            "available_date": "2024-01-20",
+            "available_date": "2025-05-20",
             "base_rent": 2200.0,
             "special_offer": "2 months free",
             "community_id": 2,
@@ -136,13 +129,12 @@ def create_sample_properties() -> List[dict]:
             "special_offer": "Concierge service included",
             "community_id": 2,
         },
-        # Properties for Oakwood Village (community_id: 3)
         {
             "description": "Family 4-bedroom house with large backyard",
             "bedrooms": 4.0,
             "bathrooms": 3.0,
             "garage": True,
-            "available_date": "2024-03-01",
+            "available_date": "2025-06-01",
             "base_rent": 3200.0,
             "special_offer": "Utilities included",
             "community_id": 3,
@@ -152,18 +144,17 @@ def create_sample_properties() -> List[dict]:
             "bedrooms": 3.0,
             "bathrooms": 2.0,
             "garage": False,
-            "available_date": "2024-01-10",
+            "available_date": "2025-06-10",
             "base_rent": 2100.0,
             "special_offer": "Pet-friendly community",
             "community_id": 3,
         },
-        # Properties for Downtown Lofts (community_id: 4)
         {
             "description": "Modern studio loft in the arts district",
             "bedrooms": 0.0,
             "bathrooms": 1.0,
             "garage": False,
-            "available_date": "2024-01-25",
+            "available_date": "2025-06-25",
             "base_rent": 1600.0,
             "special_offer": "Artist discount available",
             "community_id": 4,
@@ -173,18 +164,17 @@ def create_sample_properties() -> List[dict]:
             "bedrooms": 2.0,
             "bathrooms": 1.5,
             "garage": True,
-            "available_date": "2024-02-15",
+            "available_date": "2025-06-15",
             "base_rent": 2800.0,
             "special_offer": "Free parking included",
             "community_id": 4,
         },
-        # Properties for Mountain View Estates (community_id: 5)
         {
             "description": "Luxury 5-bedroom estate with mountain views",
             "bedrooms": 5.0,
             "bathrooms": 4.5,
             "garage": True,
-            "available_date": "2024-04-01",
+            "available_date": "2025-06-01",
             "base_rent": 5500.0,
             "special_offer": "Private chef service available",
             "community_id": 5,
@@ -209,29 +199,24 @@ def seed_database():
     logger.info("Creating database tables")
     SQLModel.metadata.create_all(engine)
 
-    # Get database session
     session = next(get_session())
 
     try:
-        # Create repositories
         community_repo = CommunityRepository()
         property_repo = PropertyRepository()
 
-        # Clear existing data (optional - comment out if you want to preserve existing data)
         logger.info("Clearing existing data")
         session.exec(text("DELETE FROM petpolicy"))
         session.exec(text("DELETE FROM property"))
         session.exec(text("DELETE FROM community"))
         session.commit()
 
-        # Seed communities with pet policies
         logger.info("Creating communities with pet policies")
         communities_data = create_sample_communities()
         community_pet_policies = create_sample_community_pet_policies()
         created_communities = []
 
         for i, community_data in enumerate(communities_data, 1):
-            # Get pet policies for this community
             pet_policies_data = next(
                 (
                     cp["pet_policies"]
@@ -241,7 +226,6 @@ def seed_database():
                 [],
             )
 
-            # Create community with pet policies
             created_community = community_repo.create_with_pet_policies(
                 session, community_data, pet_policies_data
             )
@@ -257,7 +241,6 @@ def seed_database():
                 },
             )
 
-            # Log pet policy details
             for policy_data in pet_policies_data:
                 logger.debug(
                     "Pet policy created",
@@ -273,7 +256,6 @@ def seed_database():
         properties_data = create_sample_properties()
 
         for property_data in properties_data:
-            # Create property (no pet policies - they're at community level now)
             created_property = property_repo.create(session, Property(**property_data))
 
             logger.info(
@@ -298,7 +280,6 @@ def seed_database():
             },
         )
 
-        # Log summary
         for i, community in enumerate(created_communities, 1):
             properties_in_community = [
                 p for p in properties_data if p.get("community_id") == i

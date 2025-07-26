@@ -22,13 +22,11 @@ def fetch_communities(
     repository = CommunityRepository()
 
     if community_id:
-        # Get specific community by ID
         community = repository.get_by_id(session, community_id)
         if not community:
             raise HTTPException(status_code=404, detail="Community not found")
         return community
     else:
-        # Get all communities
         return repository.get(session)
 
 
@@ -74,7 +72,6 @@ def fetch_community_pet_policies(
     """
     community_repo = CommunityRepository()
 
-    # Check if community exists
     community = community_repo.get_by_id(session, community_id)
     if not community:
         raise HTTPException(status_code=404, detail="Community not found")
@@ -102,7 +99,6 @@ def fetch_properties(
     property_repo = PropertyRepository()
     community_repo = CommunityRepository()
 
-    # Check if community exists
     community = community_repo.get_by_id(session, community_id)
     if not community:
         raise HTTPException(status_code=404, detail="Community not found")
@@ -114,7 +110,6 @@ def fetch_properties(
             status_code=404, detail=f"No properties found for community {community_id}"
         )
 
-    # Get community pet policies
     pet_policies = community_repo.get_pet_policies(session, community_id)
 
     result = []
@@ -155,7 +150,6 @@ def fetch_properties_by_community_name(
     property_repo = PropertyRepository()
     community_repo = CommunityRepository()
 
-    # Check if community exists by name
     community = community_repo.get_by_name(session, community_name)
     if not community:
         raise HTTPException(
@@ -170,7 +164,6 @@ def fetch_properties_by_community_name(
             detail=f"No properties found for community '{community_name}'",
         )
 
-    # Get community pet policies
     pet_policies = community_repo.get_pet_policies(session, community.id)
 
     result = []
@@ -222,7 +215,6 @@ def get_property_pricing(
             detail=f"Property {unit_id} does not belong to community {community_id}",
         )
 
-    # Get community pet policies to determine if pet-friendly
     community_repo = CommunityRepository()
     pet_policies = community_repo.get_pet_policies(session, community_id)
     pet_friendly = len(pet_policies) > 0
@@ -243,29 +235,26 @@ def get_property_pricing(
 def reply(request: HumanMessageRequest):
     """
     Process a human message through the agent and return the response
-    
+
     This endpoint takes a lead inquiry with structured data and processes it through the AI agent
     which can use tools to check property availability, pet policies, and pricing.
     """
     try:
         request_data = {
-            "lead": {
-                "name": request.lead.name,
-                "email": request.lead.email
-            },
+            "lead": {"name": request.lead.name, "email": request.lead.email},
             "message": request.message,
             "preferences": {
                 "bedrooms": request.preferences.bedrooms,
-                "move_in": request.preferences.move_in
+                "move_in": request.preferences.move_in,
             },
-            "community_id": request.community_id
+            "community_id": request.community_id,
         }
-        
+
         result = process_human_message(request_data)
         return AgentResponse(**result)
-    except Exception as e:
+    except Exception:
         return AgentResponse(
             reply="I'm sorry, I encountered an error while processing your request. Please try again.",
             action="",
-            proposed_time=""
+            proposed_time="",
         )

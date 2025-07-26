@@ -203,8 +203,6 @@ class MessageRepository:
         session.refresh(message)
         return message
 
-
-
     def create_human_message(
         self, session: Annotated[Session, Depends(get_session)], content: str
     ) -> Message:
@@ -221,7 +219,7 @@ class MessageRepository:
         self,
         session: Annotated[Session, Depends(get_session)],
         content: str,
-        message_type: MessageType
+        message_type: MessageType,
     ) -> Message:
         """Create a message with content and type"""
         message = Message(content=content, type=message_type)

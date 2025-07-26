@@ -38,10 +38,8 @@ def init_logger(log_level: str = "INFO", enable_json: bool = True) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Initialize logging
     init_logger(log_level="INFO", enable_json=True)
 
-    # Create database tables
     SQLModel.metadata.create_all(engine)
     yield
 

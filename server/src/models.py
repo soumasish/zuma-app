@@ -39,6 +39,7 @@ class PetPolicy(SQLModel, table=True):
     extra_pet_fee: float = 0.0
     community: Community = Relationship(back_populates="pet_policies")
 
+
 class MessageType(Enum):
     AI = "ai"
     HUMAN = "human"
