@@ -1,4 +1,4 @@
-# Zuma App - Docker Setup
+# Zuma App
 
 This project contains a React TypeScript frontend and FastAPI backend containerized with Docker.
 
